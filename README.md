@@ -62,3 +62,15 @@ python tools/validate.py && pytest -q tests
 
 `tools/validate.py` applies `schema/runbook.schema.json` and the checks a schema can't express: `id` = file
 name, only known template variables, valid regexes, unique ids. CI runs it on every PR.
+
+It also checks each runbook against the roles Vault can mint, listed in a-demo's
+[`platform/vault/runbook-roles.yaml`](https://github.com/Kyle-Law/a-demo/blob/main/platform/vault/runbook-roles.yaml)
+(read from a-demo's `main`):
+- `required_role` must be listed there. A new role is added in a-demo first: its ClusterRole, Vault
+  role, and the minter's `bind` list.
+- The role's clusters must cover where the steps act: `argocd.*` on c3, `k8s.*` on every cluster in
+  `matches.clusters` (all three when it's unset).
+- A literal step `namespace` must be one the role is minted for.
+
+Without this check a runbook could merge and only fail when Vault refuses the token mid-incident.
+Offline, `--no-vault-roles` skips it; `--vault-roles <path>` checks against a local copy.

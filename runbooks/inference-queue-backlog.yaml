@@ -8,6 +8,7 @@ description: |
 matches:
   signals: [InferenceQueueBacklog]
   resource: "^deployment/.+-vllm$"
+  clusters: [c1, c2] # the GPU clusters; inference-job-janitor is only minted there
 required_role: inference-job-janitor
 requires_approval: true
 preconditions:
