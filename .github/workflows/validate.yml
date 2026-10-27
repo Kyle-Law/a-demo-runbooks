@@ -1,0 +1,25 @@
+# Every runbook must pass schema validation before it can merge (CLAUDE.md in Kyle-Law/a-demo: runbook
+# schema validated in CI; decision 7: agent-authored runbooks are never executable until a human merges).
+name: validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements-dev.txt
+      - name: Validate runbooks
+        run: python tools/validate.py
+      - name: Validator tests
+        run: pytest -q tests
